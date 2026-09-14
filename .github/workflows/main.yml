@@ -8,14 +8,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Preparando PC virtual
+      - name: Atualizar sistema
         run: |
-          echo "PC virtual iniciado!"
-          echo "Sistema: Ubuntu"
+          sudo apt-get update
+
+      - name: Instalar desktop XFCE
+        run: |
+          sudo apt-get install -y xfce4 xfce4-goodies
+
+      - name: Instalar servidor VNC
+        run: |
+          sudo apt-get install -y tigervnc-standalone-server
+
+      - name: Preparar ambiente
+        run: |
+          mkdir -p ~/.vnc
+          echo "xfce4-session" > ~/.vnc/xstartup
+          chmod +x ~/.vnc/xstartup
+
+      - name: Verificar PC virtual
+        run: |
+          echo "================================"
+          echo "     MEU PC VIRTUAL"
+          echo "================================"
+          echo "Desktop XFCE instalado!"
+          echo "VNC instalado!"
+          echo "Sistema:"
+          lsb_release -a
           echo "CPU:"
           nproc
           echo "Memória:"
           free -h
           echo "Armazenamento:"
           df -h
-          echo "Ambiente pronto!"
