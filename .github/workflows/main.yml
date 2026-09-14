@@ -8,10 +8,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Instalar XFCE e VNC
+      - name: Instalar ambiente gráfico
         run: |
           sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tigervnc-standalone-server
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            xfce4 xfce4-goodies \
+            tigervnc-standalone-server \
+            novnc websockify \
+            curl wget
 
       - name: Configurar VNC
         run: |
@@ -37,10 +41,45 @@ jobs:
             -localhost yes \
             -SecurityTypes VncAuth
 
-          echo "VNC iniciado com sucesso!"
-          vncserver -list
+          echo "VNC iniciado!"
 
-      - name: Manter o ambiente ativo
+      - name: Iniciar noVNC
         run: |
-          echo "PC virtual funcionando..."
-          sleep 300
+          websockify \
+            --web=/usr/share/novnc/ \
+            8080 \
+            localhost:5901 > /tmp/novnc.log 2>&1 &
+
+          sleep 5
+
+          echo "noVNC iniciado!"
+
+      - name: Instalar Cloudflare Tunnel
+        run: |
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -O cloudflared
+
+          chmod +x cloudflared
+
+      - name: Criar link público
+        run: |
+          ./cloudflared tunnel --url http://localhost:8080 2>&1 | tee /tmp/cloudflare.log &
+          
+          sleep 10
+
+          echo ""
+          echo "=========================================="
+          echo "       LINK DO SEU PC VIRTUAL"
+          echo "=========================================="
+          
+          grep -o 'https://[-a-zA-Z0-9]*\.trycloudflare\.com' /tmp/cloudflare.log || true
+          
+          echo "=========================================="
+          echo "Senha do VNC: 123456"
+          echo "=========================================="
+
+      - name: Manter PC virtual funcionando
+        run: |
+          echo "PC VIRTUAL ONLINE!"
+          echo "O link acima pode ser aberto no navegador."
+          sleep 20000
