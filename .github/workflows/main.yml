@@ -8,36 +8,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Atualizar sistema
+      - name: Instalar ambiente gráfico
         run: |
           sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tigervnc-standalone-server
 
-      - name: Instalar desktop XFCE
-        run: |
-          sudo apt-get install -y xfce4 xfce4-goodies
-
-      - name: Instalar servidor VNC
-        run: |
-          sudo apt-get install -y tigervnc-standalone-server
-
-      - name: Preparar ambiente
+      - name: Configurar VNC
         run: |
           mkdir -p ~/.vnc
-          echo "xfce4-session" > ~/.vnc/xstartup
+
+          cat > ~/.vnc/xstartup <<'EOF'
+          #!/bin/sh
+          unset SESSION_MANAGER
+          unset DBUS_SESSION_BUS_ADDRESS
+          startxfce4 &
+          EOF
+
           chmod +x ~/.vnc/xstartup
 
-      - name: Verificar PC virtual
+      - name: Iniciar ambiente gráfico
         run: |
-          echo "================================"
-          echo "     MEU PC VIRTUAL"
-          echo "================================"
-          echo "Desktop XFCE instalado!"
-          echo "VNC instalado!"
-          echo "Sistema:"
-          lsb_release -a
-          echo "CPU:"
-          nproc
-          echo "Memória:"
-          free -h
-          echo "Armazenamento:"
-          df -h
+          vncserver :1 -geometry 1280x720 -depth 24 -localhost yes
+          echo "===================================="
+          echo "PC VIRTUAL INICIADO"
+          echo "Desktop: XFCE"
+          echo "Resolução: 1280x720"
+          echo "VNC: ativo"
+          echo "===================================="
+
+      - name: Manter sessão durante o job
+        run: |
+          echo "O PC virtual está funcionando."
+          sleep 300
