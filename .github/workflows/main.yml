@@ -17,6 +17,8 @@ jobs:
         run: |
           mkdir -p ~/.vnc
 
+          printf '123456\n123456\nn\n' | vncpasswd
+
           cat > ~/.vnc/xstartup <<'EOF'
           #!/bin/sh
           unset SESSION_MANAGER
@@ -29,6 +31,7 @@ jobs:
       - name: Iniciar ambiente gráfico
         run: |
           vncserver :1 -geometry 1280x720 -depth 24 -localhost yes
+
           echo "===================================="
           echo "PC VIRTUAL INICIADO"
           echo "Desktop: XFCE"
