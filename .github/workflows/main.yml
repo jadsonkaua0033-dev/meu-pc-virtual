@@ -1,0 +1,21 @@
+name: Meu PC Virtual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pc-virtual:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Preparando PC virtual
+        run: |
+          echo "PC virtual iniciado!"
+          echo "Sistema: Ubuntu"
+          echo "CPU:"
+          nproc
+          echo "Memória:"
+          free -h
+          echo "Armazenamento:"
+          df -h
+          echo "Ambiente pronto!"
