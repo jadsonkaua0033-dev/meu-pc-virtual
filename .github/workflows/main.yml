@@ -1,50 +1,46 @@
-Skip to content
-jadsonkaua0033-dev
-meu-pc-virtual
-Repository navigation
-Code
-Issues
-Pull requests
-Agents
-Actions
-Projects
-Wiki
-Security and quality
-Insights
-Settings
-Actions: jadsonkaua0033-dev/meu-pc-virtual
-Actions
-Management
-Meu PC Virtual
-Filter workflow runs
-main.yml
-Help us improve GitHub Actions
+name: Meu PC Virtual
 
-Tell us how to make GitHub Actions work better for you with three quick questions.
-5 workflow runs
-This workflow has a workflow_dispatch event trigger.
-Meu PC Virtual
-Meu PC Virtual #5: Manually run by jadsonkaua0033-dev
-main	
-43 minutes ago
- 6m 57s
-Meu PC Virtual
-Meu PC Virtual #4: Manually run by jadsonkaua0033-dev
-main	
-47 minutes ago
- 2m 7s
-Meu PC Virtual
-Meu PC Virtual #3: Manually run by jadsonkaua0033-dev
-main	
-51 minutes ago
- 1m 34s
-Meu PC Virtual
-Meu PC Virtual #2: Manually run by jadsonkaua0033-dev
-main	
-1 hour ago
- 1m 31s
-Meu PC Virtual
-Meu PC Virtual #1: Manually run by jadsonkaua0033-dev
-main	
-1 hour ago
- 10s
+on:
+  workflow_dispatch:
+
+jobs:
+  pc-virtual:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instalar XFCE e VNC
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tigervnc-standalone-server
+
+      - name: Configurar VNC
+        run: |
+          mkdir -p "$HOME/.vnc"
+
+          printf '123456\n123456\nn\n' | vncpasswd "$HOME/.vnc/passwd"
+          chmod 600 "$HOME/.vnc/passwd"
+
+          cat > "$HOME/.vnc/xstartup" <<'EOF'
+          #!/bin/sh
+          unset SESSION_MANAGER
+          unset DBUS_SESSION_BUS_ADDRESS
+          exec startxfce4
+          EOF
+
+          chmod +x "$HOME/.vnc/xstartup"
+
+      - name: Iniciar VNC
+        run: |
+          vncserver :1 \
+            -geometry 1280x720 \
+            -depth 24 \
+            -localhost yes \
+            -SecurityTypes VncAuth
+
+          echo "VNC iniciado com sucesso!"
+          vncserver -list
+
+      - name: Manter o ambiente ativo
+        run: |
+          echo "PC virtual funcionando..."
+          sleep 300
